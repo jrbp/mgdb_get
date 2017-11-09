@@ -13,7 +13,8 @@ def getSummary(t_id, query_engine=QueryEngine()):
     c = query_engine.query_one(criteria={"task_id": t_id},
                                properties=['output.final_energy',
                                            'output.crystal',
-                                           'calculations.output'])
+                                           'calculations.output',
+                                           'extra_fields'])
     struct = pmg.Structure.from_dict(c['output.crystal'])
     # is something always stored for f? may need to adjust if not
     mag_moms = PrettyTable(field_names=['Element',
@@ -35,6 +36,20 @@ def getSummary(t_id, query_engine=QueryEngine()):
         force_table.add_row([struct[i].species_string]
                             + [str(struct[i].coords)]
                             + f)
+
+    if c['extra_fields']:
+        c_extra = query_engine.query_one(criteria={"task_id": t_id},
+                                         properties=c['extra_fields'])
+        extra_fields = PrettyTable(header=False)
+        for k, v in c_extra.iteritems():
+            if type(v) is dict:  # use a table inside the table for nested dict (not recursive)
+                sub_keys = v.keys()
+                sub_table = PrettyTable(field_names=sub_keys)
+                sub_table.add_row([v[sk] for sk in sub_keys])
+                extra_fields.add_row([k, sub_table])
+            else:
+                extra_fields.add_row([k, v])
+
     summary = (str(struct)
                + '\nTotal Energy: {} eV\n'.format(c['output.final_energy'])
                + 'Band gap: {} eV\n'.format(
@@ -43,6 +58,7 @@ def getSummary(t_id, query_engine=QueryEngine()):
                + 'Total Magnetization: {}\n'.format(
                    c['calculations.output'][0]['outcar']['total_magnetization'])
                + 'Forces:\n{}\n'.format(force_table)
+               + 'Extra Fields:\n{}\n'.format(extra_fields)
                + 'Run Statistics:\n{}'.format(run_stats)
                )
     return summary

@@ -37,6 +37,17 @@ def getSummary(t_id, query_engine=QueryEngine()):
                             + [str(struct[i].coords)]
                             + f)
 
+    summary = (str(struct)
+               + '\nTotal Energy: {} eV\n'.format(c['output.final_energy'])
+               + 'Band gap: {} eV\n'.format(
+                   c['calculations.output'][0]['bandgap'])
+               + 'Magnetic moments:\n {} \n'.format(mag_moms)
+               + 'Total Magnetization: {}\n'.format(
+                   c['calculations.output'][0]['outcar']['total_magnetization'])
+               + 'Forces:\n{}\n'.format(force_table)
+               + 'Run Statistics:\n{}'.format(run_stats)
+               )
+
     if c['extra_fields']:
         c_extra = query_engine.query_one(criteria={"task_id": t_id},
                                          properties=c['extra_fields'])
@@ -49,18 +60,8 @@ def getSummary(t_id, query_engine=QueryEngine()):
                 extra_fields.add_row([k, sub_table])
             else:
                 extra_fields.add_row([k, v])
+        summary += 'Extra Fields:\n{}\n'.format(extra_fields)
 
-    summary = (str(struct)
-               + '\nTotal Energy: {} eV\n'.format(c['output.final_energy'])
-               + 'Band gap: {} eV\n'.format(
-                   c['calculations.output'][0]['bandgap'])
-               + 'Magnetic moments:\n {} \n'.format(mag_moms)
-               + 'Total Magnetization: {}\n'.format(
-                   c['calculations.output'][0]['outcar']['total_magnetization'])
-               + 'Forces:\n{}\n'.format(force_table)
-               + 'Extra Fields:\n{}\n'.format(extra_fields)
-               + 'Run Statistics:\n{}'.format(run_stats)
-               )
     return summary
 
 

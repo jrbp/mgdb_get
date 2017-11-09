@@ -43,7 +43,7 @@ def getSummary(t_id, query_engine=QueryEngine()):
                + 'Total Magnetization: {}\n'.format(
                    c['calculations.output'][0]['outcar']['total_magnetization'])
                + 'Forces:\n{}\n'.format(force_table)
-               + 'Run Statistics:\n'.format(run_stats)
+               + 'Run Statistics:\n{}'.format(run_stats)
                )
     return summary
 

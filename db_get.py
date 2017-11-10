@@ -2,6 +2,7 @@
 from __future__ import print_function
 import os
 from argparse import ArgumentParser
+from matplotlib import pyplot as plt
 from matgendb import QueryEngine
 import pymatgen as pmg
 from pymatgen.io.vasp.outputs import VaspParserError
@@ -14,7 +15,8 @@ def getSummary(t_id, query_engine=QueryEngine()):
                                properties=['output.final_energy',
                                            'output.crystal',
                                            'calculations.output',
-                                           'extra_fields'])
+                                           'extra_fields',
+                                           'notes'])
     struct = pmg.Structure.from_dict(c['output.crystal'])
     # is something always stored for f? may need to adjust if not
     mag_moms = PrettyTable(field_names=['Element',
@@ -60,8 +62,10 @@ def getSummary(t_id, query_engine=QueryEngine()):
                 extra_fields.add_row([k, sub_table])
             else:
                 extra_fields.add_row([k, v])
-        summary += 'Extra Fields:\n{}\n'.format(extra_fields)
+        summary += '\nExtra Fields:\n{}\n'.format(extra_fields)
 
+    if c['notes']:
+        summary += 'notes:\n{}'.format(c['notes'])
     return summary
 
 
@@ -239,7 +243,6 @@ if __name__ == "__main__":
             for psp in input_data[3]:
                 print(psp['titel']+'\t'+psp['hash'])
     if args.bands:
-        from matplotlib import pyplot as plt
         fig = plotBands(args.t_id, filename=args.bands, query_engine=qe,
                         band_range=args.band_range, kpoints_file=args.band_labels)
         if args.bands.strip(" "):

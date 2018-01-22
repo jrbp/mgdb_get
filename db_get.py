@@ -214,7 +214,7 @@ if __name__ == "__main__":
                                   "i.e. 'BTO.cif' will produce a cif file, "
                                   "'POSCAR' will produce a vasp input file"))
     arg_parser.add_argument("-c", "--config_file", required=False,
-                            default="/home/public/perovskite2016/DB/db.json",
+                            default="/home/john/Documents/research/perovskite_database/local_db/db.json",
                             help="location of db.json config file")
     args = arg_parser.parse_args()
 

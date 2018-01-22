@@ -65,7 +65,7 @@ def getSummary(t_id, query_engine=QueryEngine()):
         summary += '\nExtra Fields:\n{}\n'.format(extra_fields)
 
     if c['notes']:
-        summary += 'notes:\n{}'.format(c['notes'])
+        summary += '\nnotes:\n{}\n'.format(c['notes'])
     return summary
 
 
